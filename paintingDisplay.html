@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paintings Editor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar" id="paintingsList"></div>
+
+    <div class="content" id="formContainer">
+        <div class="form-section" id="formTemplate" style="display: none;">
+            <h2 id="formTitle"></h2>
+            <form id="paintingForm">
+                <label for="title">Title:</label><br>
+                <input type="text" id="title" name="title"><br><br>
+                <label for="artist">Artist:</label><br>
+                <input type="text" id="artist" name="artist"><br><br>
+                <label for="year">Year:</label><br>
+                <input type="text" id="year" name="year"><br><br>
+                <input type="submit" value="Save">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch and display paintings
+        async function loadPaintings() {
+            try {
+                const response = await fetch('mongodb://localhost:27017/paintings');
+                const paintings = await response.json();
+                const paintingsList = document.getElementById('paintingsList');
+                paintingsList.innerHTML = ''; // Clear existing content
+
+                paintings.forEach(painting => {
+                    const item = document.createElement('div');
+                    item.className = 'sidebar-item';
+
+                    const img = document.createElement('img');
+                    img.src = painting.imageUrl;
+                    img.alt = painting.title;
+                    img.style.width = '50px';
+                    img.style.marginRight = '10px';
+
+                    const button = document.createElement('button');
+                    button.textContent = painting.title;
+                    button.onclick = () => populateForm(painting);
+
+                    item.appendChild(img);
+                    item.appendChild(button);
+                    paintingsList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error loading paintings:', error);
+            }
+        }
+
+        // Function to populate the form with data
+        function populateForm(painting) {
+            const formContainer = document.getElementById('formTemplate');
+            formContainer.style.display = 'block';
+
+            document.getElementById('formTitle').textContent = `Edit: ${painting.title}`;
+            document.getElementById('title').value = painting.title;
+            document.getElementById('artist').value = painting.artist;
+            document.getElementById('year').value = painting.year;
+        }
+
+        // Load paintings when the page loads
+        window.onload = loadPaintings;
+    </script>
+</body>
+</html>
