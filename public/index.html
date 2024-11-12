@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painting Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="painting-list"></div>
+        <form id="edit-form">
+            <input type="text" id="title" placeholder="Title" required><br>
+            <input type="text" id="artist" placeholder="Artist" required><br>
+            <input type="number" id="year" placeholder="Year" required><br>
+            <textarea id="description" placeholder="Description"></textarea><br>
+            <input type="text" id="image" placeholder="Image URL"><br>
+            <button type="submit">Save</button>
+            <button type="reset">Reset</button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
