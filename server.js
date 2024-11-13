@@ -1,26 +1,48 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const paintingRoutes = require('./routes/paintingRoutes'); // Import your routes
-
+const path = require('path');
 const app = express();
-const PORT = 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json()); // Parse JSON data
-app.use(express.static('public')); // Serve static files from the 'public' folder
-
-// Routes
-app.use('/api/paintings', paintingRoutes); // Use painting routes
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/paintings')
+mongoose.connect('mongodb://127.0.0.1:27017/paintings', { useNewUrlParser: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Failed to connect to MongoDB', err));
 
+// Mongoose Model
+const Painting = require('./models/Painting');
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+// API endpoint to fetch all paintings
+app.get('/api/paintings', async (req, res) => {
+    try {
+        const paintings = await Painting.find();
+        res.json(paintings);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching paintings' });
+    }
 });
+
+// API endpoint to update a painting
+app.put('/api/paintings/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const updatedPainting = await Painting.findOneAndUpdate({ _id: id }, req.body, { new: true });
+        res.json({ message: "Painting updated successfully!", painting: updatedPainting });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating painting' });
+    }
+});
+
+// Route to handle image requests
+app.get('/images/:imageName', (req, res) => {
+    const imagePath = path.join(__dirname, 'images', req.params.imageName);
+    res.sendFile(imagePath, (err) => {
+        if (err) {
+            res.sendFile(path.join(__dirname, 'images', 'dummyImage.jpg'));
+        }
+    });
+});
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
